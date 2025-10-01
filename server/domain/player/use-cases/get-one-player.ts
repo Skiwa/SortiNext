@@ -1,10 +1,11 @@
 import { Dependencies } from "@/server/infrastructure/container/ServiceContainer";
 import { Player, PlayerId } from "../entities/Player";
+import { Effect } from "effect";
 
-export class GetPlayerUseCase {
+export class GetOnePlayer {
   constructor(private readonly deps: Dependencies) {}
 
-  async execute(id: PlayerId): Promise<Player | null> {
-    return await this.deps.playerRepository.findById(id);
+  execute(id: PlayerId): Effect.Effect<Player | null> {
+    return this.deps.playerRepository.findById(id);
   }
 }

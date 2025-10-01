@@ -1,3 +1,4 @@
+import { Effect, pipe } from "effect";
 import {
   Track,
   TrackId,
@@ -9,19 +10,24 @@ import { PrismaClient } from "../PrismaClient";
 export class PrismaTrackRepository implements TrackRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async findById(id: TrackId): Promise<Track | null> {
-    const trackData = await this.prisma.track.findUnique({
-      where: { id },
-    });
+  findById(id: TrackId): Effect.Effect<Track | null> {
+    return pipe(
+      Effect.promise(() =>
+        this.prisma.track.findUnique({
+          where: { id },
+        })
+      ),
+      Effect.map((trackData) => {
+        if (!trackData) {
+          return null;
+        }
 
-    if (!trackData) {
-      return null;
-    }
-
-    return Track.fromState({
-      duration: trackData.duration,
-      id: TrackIdSchema.parse(trackData.id),
-      title: trackData.title,
-    });
+        return Track.fromState({
+          duration: trackData.duration,
+          id: TrackIdSchema.parse(trackData.id),
+          title: trackData.title,
+        });
+      })
+    );
   }
 }

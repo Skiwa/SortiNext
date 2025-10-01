@@ -9,11 +9,15 @@ export abstract class Entity<TState extends { id: unknown }> {
     return this.state.id;
   }
 
-  getState(): TState {
+  toState(): TState {
     return this.state;
   }
 
   protected setState(partialState: Partial<Omit<TState, "id">>): void {
     this.state = { ...this.state, ...partialState };
+  }
+
+  equals(other: Entity<TState>): boolean {
+    return this.state.id === other.state.id;
   }
 }

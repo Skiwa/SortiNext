@@ -6,8 +6,8 @@ import {
   PlaybackPositionSchema,
 } from "../value-objects/PlaybackPosition";
 
-const PlayerIdSchema = z.uuid().brand("PlayerId");
-const createPlayerId = () => PlayerIdSchema.parse(crypto.randomUUID());
+export const PlayerIdSchema = z.uuid().brand("PlayerId");
+export const createPlayerId = () => PlayerIdSchema.parse(crypto.randomUUID());
 
 const PlayerStateSchema = z.object({
   currentTrackId: TrackIdSchema.nullable(),
@@ -45,6 +45,10 @@ export class Player extends Entity<PlayerState> {
 
   getCurrentTrackId(): z.infer<typeof TrackIdSchema> | null {
     return this.state.currentTrackId;
+  }
+
+  getId(): PlayerId {
+    return this.state.id;
   }
 
   getPlaybackPosition(): number {

@@ -1,42 +1,56 @@
 import { TrackIdSchema } from "@/server/domain/player/entities/Track";
-import { Player, PlayerId } from "../../../../domain/player/entities/Player";
+import {
+  Player,
+  PlayerId,
+  PlayerIdSchema,
+} from "../../../../domain/player/entities/Player";
 import { PlayerRepository } from "../../../../domain/player/repositories/PlayerRepository";
 import { PrismaClient } from "../PrismaClient";
+import { Effect, pipe } from "effect";
 
 export class PrismaPlayerRepository implements PlayerRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async save(player: Player): Promise<void> {
+  save(player: Player): Effect.Effect<void> {
     const state = player.getState();
 
-    await this.prisma.player.upsert({
-      where: { id: state.id },
-      create: {
-        id: state.id,
-        currentTrackId: state.currentTrackId,
-        playbackPosition: state.playbackPosition,
-      },
-      update: {
-        currentTrackId: state.currentTrackId,
-        playbackPosition: state.playbackPosition,
-      },
-    });
+    const p = () =>
+      this.prisma.player.upsert({
+        where: { id: state.id },
+        create: {
+          id: state.id,
+          currentTrackId: state.currentTrackId,
+          playbackPosition: state.playbackPosition,
+        },
+        update: {
+          currentTrackId: state.currentTrackId,
+          playbackPosition: state.playbackPosition,
+        },
+      });
+
+    return Effect.promise(p);
   }
 
-  async findById(id: PlayerId): Promise<Player | null> {
-    const playerData = await this.prisma.player.findUnique({
-      where: { id },
-      include: { currentTrack: true },
-    });
+  findById(id: PlayerId): Effect.Effect<Player | null> {
+    const p = () =>
+      this.prisma.player.findUnique({
+        where: { id },
+        include: { currentTrack: true },
+      });
 
-    if (!playerData) {
-      return null;
-    }
+    return pipe(
+      Effect.promise(p),
+      Effect.map((playerData) => {
+        if (!playerData) {
+          return null;
+        }
 
-    return Player.fromState({
-      id: playerData.id as PlayerId,
-      currentTrackId: TrackIdSchema.parse(playerData.currentTrackId),
-      playbackPosition: playerData.playbackPosition,
-    });
+        return Player.fromState({
+          ...playerData,
+          currentTrackId: TrackIdSchema.parse(playerData.currentTrackId),
+          id: PlayerIdSchema.parse(playerData.id),
+        });
+      })
+    );
   }
 }

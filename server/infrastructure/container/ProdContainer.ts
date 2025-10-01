@@ -1,14 +1,7 @@
 import { PrismaClient } from "../database/prisma/PrismaClient";
 import { PrismaPlayerRepository } from "../database/prisma/repositories/PrismaPlayerRepository";
 import { PrismaTrackRepository } from "../database/prisma/repositories/PrismaTrackRepository";
-import { PlayerRepository } from "../../domain/player/repositories/PlayerRepository";
-import { TrackRepository } from "../../domain/player/repositories/TrackRepository";
-import { Container } from "./ServiceContainer";
-
-export type Dependencies = {
-  playerRepository: PlayerRepository;
-  trackRepository: TrackRepository;
-};
+import { Container, Dependencies } from "./ServiceContainer";
 
 export class ProdContainer implements Container {
   private prisma: PrismaClient;

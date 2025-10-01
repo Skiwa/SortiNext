@@ -2,7 +2,7 @@ import { z } from "zod";
 import { Entity } from "../../shared/Entity";
 
 export const TrackIdSchema = z.uuid().brand("TrackId");
-const createTrackId = () => TrackIdSchema.parse(crypto.randomUUID());
+export const createTrackId = () => TrackIdSchema.parse(crypto.randomUUID());
 
 const TrackStateSchema = z.object({
   duration: z.number().positive(),
@@ -26,6 +26,10 @@ export class Track extends Entity<TrackState> {
       id: createTrackId(),
     };
     return new Track(state);
+  }
+
+  getId(): TrackId {
+    return this.state.id;
   }
 
   static fromState(state: TrackState): Track {

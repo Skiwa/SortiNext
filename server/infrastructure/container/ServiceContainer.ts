@@ -1,7 +1,7 @@
 import { PlayerRepository } from "../../domain/player/repositories/PlayerRepository";
 import { TrackRepository } from "../../domain/player/repositories/TrackRepository";
-import { GetPlayerUseCase } from "../../domain/player/use-cases/GetPlayerUseCase";
-import { GetTrackUseCase } from "../../domain/player/use-cases/GetTrackUseCase";
+import { GetOnePlayer } from "../../domain/player/use-cases/get-one-player";
+import { GetOneTrack } from "../../domain/player/use-cases/get-one-track";
 import { ProdContainer } from "./ProdContainer";
 
 export interface Container {
@@ -15,8 +15,8 @@ export type Dependencies = {
 };
 
 export type UseCases = {
-  getPlayerUseCase: GetPlayerUseCase;
-  getTrackUseCase: GetTrackUseCase;
+  getPlayerUseCase: GetOnePlayer;
+  getTrackUseCase: GetOneTrack;
 };
 
 export class ServiceContainer {
@@ -39,8 +39,8 @@ export class ServiceContainer {
 
   buildUseCases(dependencies: Dependencies): UseCases {
     return {
-      getPlayerUseCase: new GetPlayerUseCase(dependencies),
-      getTrackUseCase: new GetTrackUseCase(dependencies),
+      getPlayerUseCase: new GetOnePlayer(dependencies),
+      getTrackUseCase: new GetOneTrack(dependencies),
     };
   }
 }

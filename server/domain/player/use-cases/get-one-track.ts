@@ -1,10 +1,11 @@
 import { Track, TrackId } from "../entities/Track";
 import { Dependencies } from "@/server/infrastructure/container/ServiceContainer";
+import { Effect } from "effect";
 
-export class GetTrackUseCase {
+export class GetOneTrack {
   constructor(private readonly deps: Dependencies) {}
 
-  async execute(id: TrackId): Promise<Track | null> {
-    return await this.deps.trackRepository.findById(id);
+  execute(id: TrackId): Effect.Effect<Track | null> {
+    return this.deps.trackRepository.findById(id);
   }
 }
