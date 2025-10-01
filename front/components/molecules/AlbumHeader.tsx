@@ -1,10 +1,10 @@
 interface AlbumHeaderProps {
+  artist: string;
   imageUrl: string;
   title: string;
-  artist: string;
-  year: string;
-  trackCount: number;
   totalDuration: number;
+  trackCount: number;
+  year: string;
 }
 
 export function AlbumHeader({

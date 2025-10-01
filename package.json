@@ -18,6 +18,7 @@
   "dependencies": {
     "@prisma/client": "^6.16.3",
     "chance": "^1.1.13",
+    "date-fns": "^4.1.0",
     "effect": "^3.18.1",
     "next": "15.5.4",
     "prisma": "^6.16.3",
