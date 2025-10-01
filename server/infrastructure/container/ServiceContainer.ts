@@ -3,6 +3,7 @@ import { TrackRepository } from "../../domain/player/repositories/TrackRepositor
 import { AlbumRepository } from "../../domain/player/repositories/AlbumRepository";
 import { GetOnePlayer } from "../../domain/player/use-cases/get-one-player";
 import { GetOneTrack } from "../../domain/player/use-cases/get-one-track";
+import { GetOneAlbumWithTracksUseCase } from "../../domain/player/use-cases/get-one-album-with-tracks";
 import { ProdContainer } from "./ProdContainer";
 
 export interface Container {
@@ -17,6 +18,7 @@ export type Dependencies = {
 };
 
 export type UseCases = {
+  getAlbumWithTracksUseCase: GetOneAlbumWithTracksUseCase;
   getPlayerUseCase: GetOnePlayer;
   getTrackUseCase: GetOneTrack;
 };
@@ -43,6 +45,7 @@ export class ServiceContainer {
     return {
       getPlayerUseCase: new GetOnePlayer(dependencies),
       getTrackUseCase: new GetOneTrack(dependencies),
+      getAlbumWithTracksUseCase: new GetOneAlbumWithTracksUseCase(dependencies),
     };
   }
 }
