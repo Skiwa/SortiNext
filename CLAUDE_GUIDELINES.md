@@ -78,32 +78,48 @@
 ### Folder Structure
 
 ```
-/app                    # Next.js App Router pages
-/components            # Atomic Design components
-  /atoms               # Button, Input, Icon, etc.
-  /molecules           # SearchBar, TrackItem, etc.
-  /organisms           # Sidebar, Player, TrackList, etc.
-  /templates           # Page layouts
-/domain                # Domain models & business logic
-  /authentication
-  /library
-  /player
-  /discovery
-/services              # Infrastructure services
-  /api                 # API clients
-  /storage             # LocalStorage, IndexedDB
-  /audio               # Audio player service
-/adapters              # Hexagonal architecture adapters
-  /repositories        # Data access
-  /controllers         # API controllers
-/tests                 # Unit, integration, e2e tests
-/public                # Static assets
+/app                           # Next.js App Router
+  /(routes)/                   # Application pages and layouts
+  /api/                        # Backend API routes
+
+/src                           # Frontend application
+  /components                  # Atomic Design
+    /atoms
+    /molecules
+    /organisms
+    /templates
+  /domain                      # Frontend business logic
+    /player
+    /queue
+  /application                 # Frontend use cases
+    /player
+    /queue
+  /infrastructure              # Frontend services
+    /audio
+    /storage
+    /http
+
+/server                        # Backend application
+  /domain                      # Backend business logic
+    /catalog
+  /application                 # Backend use cases
+    /catalog
+  /infrastructure              # Backend services
+    /database
+    /http
+
+/tests
+  /src                         # Frontend tests
+  /server                      # Backend tests
+
+/public                        # Static assets
 ```
 
 ### Software Craft Principles
 
 - **Hexagonal Architecture**: Strict separation between domain, application, and infrastructure layers - domain must not depend on external concerns
 - **TDD**: Write tests before implementation - this is mandatory and how we communicate about features
+- **Gherkin Tests**: All domain tests must use Gherkin syntax (Given/When/Then) for clarity and business alignment
 - **YAGNI**: Don't implement features until needed
 - **KISS**: Keep solutions simple and straightforward
 - **DRY**: Don't repeat yourself, but avoid premature abstraction
@@ -111,6 +127,47 @@
 - **Refactoring**: Continuous small improvements
 - **Code Review**: Every PR must be reviewed
 - **Self-documenting code**: Code should be clear enough to understand without comments - only add comments when absolutely necessary to explain "why", not "what"
+
+### Testing Guidelines
+
+- Use Gherkin syntax (Given/When/Then) for all domain tests
+- Test business rules and behavior, not implementation details
+- Focus on value objects and entities with real business logic
+- Avoid testing simple getters/setters without business rules
+- **Colocate tests**: Place test files next to source files (e.g., `Player.ts` and `Player.test.ts` in same directory)
+- **Fixture pattern**: Use `createFixtures()` function with `given`/`when`/`then` objects for clear test structure
+- Test structure example:
+  ```typescript
+  describe("Feature: PlaybackPosition", () => {
+    let fixture: ReturnType<typeof createFixtures>;
+
+    beforeEach(() => {
+      fixture = createFixtures();
+    });
+
+    it("Given valid seconds, When creating position, Then it should store the value", () => {
+      const seconds = fixture.given.validSeconds();
+      const position = fixture.when.createPosition(seconds);
+      fixture.then.shouldHaveSeconds(position, seconds);
+    });
+  });
+
+  function createFixtures() {
+    return {
+      given: {
+        validSeconds: () => 42,
+      },
+      when: {
+        createPosition: (seconds: number) => PlaybackPosition.create(seconds),
+      },
+      then: {
+        shouldHaveSeconds: (position: PlaybackPosition, expected: number) => {
+          expect(position.getSeconds()).toBe(expected);
+        },
+      },
+    };
+  }
+  ```
 
 ### Music Player Principles
 
