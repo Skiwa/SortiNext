@@ -1,8 +1,17 @@
 -- CreateTable
+CREATE TABLE "albums" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "title" TEXT NOT NULL,
+    "imageUrl" TEXT NOT NULL
+);
+
+-- CreateTable
 CREATE TABLE "tracks" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "title" TEXT NOT NULL,
-    "duration_seconds" INTEGER NOT NULL
+    "duration_seconds" INTEGER NOT NULL,
+    "albumId" TEXT,
+    CONSTRAINT "tracks_albumId_fkey" FOREIGN KEY ("albumId") REFERENCES "albums" ("id") ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- CreateTable

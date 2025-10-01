@@ -32,6 +32,14 @@ export class Track extends Entity<TrackState> {
     return this.state.id;
   }
 
+  getTitle(): string {
+    return this.state.title;
+  }
+
+  getDuration(): number {
+    return this.state.duration;
+  }
+
   static fromState(state: TrackState): Track {
     return new Track(state);
   }

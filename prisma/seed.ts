@@ -37,6 +37,7 @@ async function main() {
     data: {
       id: "album-1",
       title: "Dans la radio",
+      imageUrl: "https://via.placeholder.com/300x300?text=Dans+la+radio",
     },
   });
 
@@ -44,6 +45,7 @@ async function main() {
     data: {
       id: "album-2",
       title: "Tout est magnifique",
+      imageUrl: "https://via.placeholder.com/300x300?text=Tout+est+magnifique",
     },
   });
 

@@ -7,7 +7,7 @@ export const createAlbumId = () => AlbumIdSchema.parse(crypto.randomUUID());
 
 const AlbumStateSchema = z.object({
   id: AlbumIdSchema,
-  imageUrl: z.url().optional(),
+  imageUrl: z.url(),
   title: z.string().min(1),
   tracks: TrackIdSchema.array(),
 });

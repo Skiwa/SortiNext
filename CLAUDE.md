@@ -128,6 +128,33 @@
 - **Code Review**: Every PR must be reviewed
 - **Self-documenting code**: Code should be clear enough to understand without comments - only add comments when absolutely necessary to explain "why", not "what"
 
+### Use Cases & DTOs Architecture
+
+- **Use Cases return Domain Entities**: Use cases must return domain entities/aggregates, not DTOs
+- **DTOs in API Layer**: Transform entities to DTOs only in the API layer (`/app/api/`)
+- **Separation of Concerns**: Keep business logic (use cases) separate from presentation logic (DTOs)
+- **Reusability**: Use cases can be reused across different clients (REST API, GraphQL, CLI, etc.)
+- **Example Structure**:
+
+  ```typescript
+  // Use case returns domain entity
+  class GetOnePlayerUseCase {
+    execute(id: PlayerId): Effect.Effect<Player, PlayerNotFound> {
+      // Returns Player entity
+    }
+  }
+
+  // API layer transforms to DTO
+  export async function GET(request: Request) {
+    const player = await GetOnePlayerUseCase.execute(id);
+    return Response.json({
+      id: player.getId(),
+      currentTrack: player.getCurrentTrack()?.getId(),
+      position: player.getPosition().getSeconds(),
+    });
+  }
+  ```
+
 ### Testing Guidelines
 
 - Use Gherkin syntax (Given/When/Then) for all domain tests
@@ -137,6 +164,7 @@
 - **Colocate tests**: Place test files next to source files (e.g., `Player.ts` and `Player.test.ts` in same directory)
 - **Fixture pattern**: Use `createFixtures()` function with `given`/`when`/`then` objects for clear test structure
 - Test structure example:
+
   ```typescript
   describe("Feature: PlaybackPosition", () => {
     let fixture: ReturnType<typeof createFixtures>;

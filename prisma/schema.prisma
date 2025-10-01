@@ -12,8 +12,9 @@ datasource db {
 }
 
 model Album {
-  id     String @id @default(uuid())
-  title  String
+  id       String @id @default(uuid())
+  title    String
+  imageUrl String
   
   // Relations
   tracks Track[]

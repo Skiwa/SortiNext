@@ -4,10 +4,11 @@ import {
   AlbumId,
   AlbumIdSchema,
 } from "../../../../domain/player/entities/Album";
+import { Track, TrackIdSchema } from "../../../../domain/player/entities/Track";
+import { AlbumAggregate } from "../../../../domain/player/aggregates/AlbumAggregate";
 import { AlbumRepository } from "../../../../domain/player/repositories/AlbumRepository";
 import { AlbumNotFound } from "@/server/domain/player/errors/AlbumNotFound";
 import { Effect, pipe } from "effect";
-import { TrackIdSchema } from "@/server/domain/player/entities/Track";
 
 export class PrismaAlbumRepository implements AlbumRepository {
   constructor(private prisma: PrismaClient) {}
@@ -28,11 +29,49 @@ export class PrismaAlbumRepository implements AlbumRepository {
         return Effect.succeed(
           Album.fromState({
             id: AlbumIdSchema.parse(album.id),
+            imageUrl: album.imageUrl,
             title: album.title,
-            tracks: album.tracks.map((track) => TrackIdSchema.parse(track)),
-            imageUrl: album.imageUrl || undefined,
+            tracks: [],
           })
         );
+      })
+    );
+  }
+
+  findByIdWithTracks(
+    id: AlbumId
+  ): Effect.Effect<AlbumAggregate, AlbumNotFound> {
+    const p = () =>
+      this.prisma.album.findUnique({
+        where: { id },
+        include: {
+          tracks: true,
+        },
+      });
+
+    return pipe(
+      Effect.promise(p),
+      Effect.flatMap((data) => {
+        if (!data) {
+          return Effect.fail(new AlbumNotFound(id));
+        }
+
+        const album = Album.fromState({
+          id: AlbumIdSchema.parse(data.id),
+          imageUrl: data.imageUrl,
+          title: data.title,
+          tracks: data.tracks.map((track) => TrackIdSchema.parse(track.id)),
+        });
+
+        const tracks = data.tracks.map((trackData) =>
+          Track.fromState({
+            duration: trackData.duration,
+            id: TrackIdSchema.parse(trackData.id),
+            title: trackData.title,
+          })
+        );
+
+        return Effect.succeed(AlbumAggregate.create(album, tracks));
       })
     );
   }
@@ -45,14 +84,12 @@ export class PrismaAlbumRepository implements AlbumRepository {
         where: { id: state.id },
         create: {
           id: state.id,
-          title: state.title,
-          tracks: state.tracks,
           imageUrl: state.imageUrl,
+          title: state.title,
         },
         update: {
-          title: state.title,
-          tracks: state.tracks,
           imageUrl: state.imageUrl,
+          title: state.title,
         },
       })
     );
