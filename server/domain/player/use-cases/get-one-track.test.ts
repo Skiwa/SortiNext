@@ -4,6 +4,7 @@ import { GetOneTrack } from "./get-one-track";
 import { createTrackId, Track, TrackId } from "../entities/Track";
 import { createCommonFixtures } from "../../../../tests/fixtures/common-assertions";
 import { getInMemoryDependencies } from "@/tests/in-memory-dependencies";
+import { TrackNotFound } from "../errors/TrackNotFound";
 
 describe("Feature: GetOneTrack", () => {
   let fixture: ReturnType<typeof createFixtures>;
@@ -24,12 +25,11 @@ describe("Feature: GetOneTrack", () => {
       fixture.then.shouldBeSameEntity(result, track);
     });
 
-    it("Given non-existing track ID, When getting track, Then should return null", async () => {
+    it("Given non-existing track ID, When getting track, Then should return TrackNotFound", async () => {
       const trackId = createTrackId();
       const exit = await fixture.when.execute(trackId);
 
-      const result = fixture.then.shouldSucceed(exit);
-      fixture.then.shouldBeNull(result);
+      fixture.then.shouldFailWithErrorTag(exit, "TrackNotFound");
     });
   });
 });
@@ -50,7 +50,9 @@ function createFixtures() {
     },
     when: {
       ...commonFixtures.when,
-      execute: async (trackId: TrackId): Promise<Exit.Exit<Track | null>> => {
+      execute: async (
+        trackId: TrackId
+      ): Promise<Exit.Exit<Track, TrackNotFound>> => {
         return Effect.runPromiseExit(service.execute(trackId));
       },
     },
