@@ -1,0 +1,34 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../server/infrastructure/database/generated"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Track {
+  id       String @id @default(uuid())
+  title    String
+  duration Int    @map("duration_seconds")
+  
+  // Relations
+  players Player[]
+  
+  @@map("tracks")
+}
+
+model Player {
+  id                String  @id @default(uuid())
+  currentTrackId    String?
+  playbackPosition  Int     @default(0) @map("playback_position_seconds")
+  
+  // Relations
+  currentTrack Track? @relation(fields: [currentTrackId], references: [id])
+  
+  @@map("players")
+}

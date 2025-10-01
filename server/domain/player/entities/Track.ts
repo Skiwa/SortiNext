@@ -27,4 +27,8 @@ export class Track extends Entity<TrackState> {
     };
     return new Track(state);
   }
+
+  static fromState(state: TrackState): Track {
+    return new Track(state);
+  }
 }

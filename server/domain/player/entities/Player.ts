@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { Entity } from "../../shared/Entity";
 import { TrackIdSchema } from "./Track";
-import { PlaybackPosition, PlaybackPositionSchema } from "../value-objects/PlaybackPosition";
+import {
+  PlaybackPosition,
+  PlaybackPositionSchema,
+} from "../value-objects/PlaybackPosition";
 
 const PlayerIdSchema = z.uuid().brand("PlayerId");
 const createPlayerId = () => PlayerIdSchema.parse(crypto.randomUUID());
@@ -26,6 +29,10 @@ export class Player extends Entity<PlayerState> {
       id: createPlayerId(),
       playbackPosition: PlaybackPosition.createAtZero().getValue(),
     };
+    return new Player(state);
+  }
+
+  static fromState(state: PlayerState): Player {
     return new Player(state);
   }
 
