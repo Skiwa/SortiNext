@@ -1,4 +1,5 @@
-import { SimplePlayer } from "@/src/components/organisms/SimplePlayer";
+import { SimplePlayer } from "@/front/components/organisms/SimplePlayer";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -12,6 +13,26 @@ export default function Home() {
             Votre plateforme de musique nouvelle génération
           </p>
         </header>
+
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold mb-6 text-center">
+            Albums populaires
+          </h2>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/albums/550e8400-e29b-41d4-a716-446655440010"
+              className="bg-gray-800 hover:bg-gray-700 transition-colors duration-200 rounded-lg p-4 text-center border border-gray-700 hover:border-green-400"
+            >
+              <h3 className="text-lg font-medium mb-2">Dans la radio</h3>
+            </Link>
+            <Link
+              href="/albums/550e8400-e29b-41d4-a716-446655440011"
+              className="bg-gray-800 hover:bg-gray-700 transition-colors duration-200 rounded-lg p-4 text-center border border-gray-700 hover:border-green-400"
+            >
+              <h3 className="text-lg font-medium mb-2">Tout est magnifique</h3>
+            </Link>
+          </div>
+        </section>
 
         <main className="flex justify-center">
           <SimplePlayer />
