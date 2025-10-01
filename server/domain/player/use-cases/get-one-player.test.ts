@@ -4,6 +4,7 @@ import { GetOnePlayer } from "./get-one-player";
 import { createPlayerId, Player, PlayerId } from "../entities/Player";
 import { createCommonFixtures } from "../../../../tests/fixtures/common-assertions";
 import { getInMemoryDependencies } from "@/tests/in-memory-dependencies";
+import { PlayerNotFound } from "../errors/PlayerNotFound";
 
 describe("Feature: GetOnePlayer", () => {
   let fixture: ReturnType<typeof createFixtures>;
@@ -24,12 +25,11 @@ describe("Feature: GetOnePlayer", () => {
       fixture.then.shouldBeSameEntity(result, player);
     });
 
-    it("Given non-existing player ID, When getting player, Then should return null", async () => {
+    it("Given non-existing player ID, When getting player, Then should return PlayerNotFound", async () => {
       const playerId = createPlayerId();
       const exit = await fixture.when.execute(playerId);
 
-      const result = fixture.then.shouldSucceed(exit);
-      fixture.then.shouldBeNull(result);
+      fixture.then.shouldFailWithErrorTag(exit, "PlayerNotFound");
     });
   });
 });
@@ -52,7 +52,7 @@ function createFixtures() {
       ...commonFixtures.when,
       execute: async (
         playerId: PlayerId
-      ): Promise<Exit.Exit<Player | null>> => {
+      ): Promise<Exit.Exit<Player, PlayerNotFound>> => {
         return Effect.runPromiseExit(service.execute(playerId));
       },
     },
