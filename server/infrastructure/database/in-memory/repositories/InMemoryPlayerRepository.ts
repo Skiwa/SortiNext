@@ -5,6 +5,7 @@ import {
   PlayerState,
 } from "../../../../domain/player/entities/Player";
 import { PlayerRepository } from "../../../../domain/player/repositories/PlayerRepository";
+import { PlayerNotFound } from "@/server/domain/player/errors/PlayerNotFound";
 
 export class InMemoryPlayerRepository implements PlayerRepository {
   private collection: Map<string, PlayerState> = new Map();
@@ -16,11 +17,11 @@ export class InMemoryPlayerRepository implements PlayerRepository {
     return Effect.void;
   }
 
-  findById(id: PlayerId): Effect.Effect<Player | null> {
+  findByIdOrFail(id: PlayerId): Effect.Effect<Player, PlayerNotFound> {
     const playerData = this.collection.get(id);
 
     if (!playerData) {
-      return Effect.succeed(null);
+      return Effect.fail(new PlayerNotFound(id));
     }
 
     const player = Player.fromState(playerData);

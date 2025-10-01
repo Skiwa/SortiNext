@@ -1,5 +1,6 @@
 import { PlayerRepository } from "../../domain/player/repositories/PlayerRepository";
 import { TrackRepository } from "../../domain/player/repositories/TrackRepository";
+import { AlbumRepository } from "../../domain/player/repositories/AlbumRepository";
 import { GetOnePlayer } from "../../domain/player/use-cases/get-one-player";
 import { GetOneTrack } from "../../domain/player/use-cases/get-one-track";
 import { ProdContainer } from "./ProdContainer";
@@ -10,6 +11,7 @@ export interface Container {
 }
 
 export type Dependencies = {
+  albumRepository: AlbumRepository;
   playerRepository: PlayerRepository;
   trackRepository: TrackRepository;
 };
@@ -22,7 +24,7 @@ export type UseCases = {
 export class ServiceContainer {
   private static instance: ServiceContainer;
   private dependencies: Dependencies;
-  private useCases: UseCases;
+  public useCases: UseCases;
 
   private constructor() {
     const prodContainer = new ProdContainer();
@@ -37,7 +39,7 @@ export class ServiceContainer {
     return ServiceContainer.instance;
   }
 
-  buildUseCases(dependencies: Dependencies): UseCases {
+  private buildUseCases(dependencies: Dependencies): UseCases {
     return {
       getPlayerUseCase: new GetOnePlayer(dependencies),
       getTrackUseCase: new GetOneTrack(dependencies),

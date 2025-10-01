@@ -11,13 +11,25 @@ datasource db {
   url      = "file:./dev.db"
 }
 
+model Album {
+  id     String @id @default(uuid())
+  title  String
+  
+  // Relations
+  tracks Track[]
+  
+  @@map("albums")
+}
+
 model Track {
   id       String @id @default(uuid())
   title    String
   duration Int    @map("duration_seconds")
+  albumId  String?
   
   // Relations
   players Player[]
+  album   Album?  @relation(fields: [albumId], references: [id])
   
   @@map("tracks")
 }

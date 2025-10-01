@@ -7,12 +7,13 @@ import {
 import { PlayerRepository } from "../../../../domain/player/repositories/PlayerRepository";
 import { PrismaClient } from "../PrismaClient";
 import { Effect, pipe } from "effect";
+import { PlayerNotFound } from "../../../../domain/player/errors/PlayerNotFound";
 
 export class PrismaPlayerRepository implements PlayerRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   save(player: Player): Effect.Effect<void> {
-    const state = player.getState();
+    const state = player.toState();
 
     const p = () =>
       this.prisma.player.upsert({
@@ -31,7 +32,7 @@ export class PrismaPlayerRepository implements PlayerRepository {
     return Effect.promise(p);
   }
 
-  findById(id: PlayerId): Effect.Effect<Player | null> {
+  findByIdOrFail(id: PlayerId): Effect.Effect<Player, PlayerNotFound> {
     const p = () =>
       this.prisma.player.findUnique({
         where: { id },
@@ -40,16 +41,18 @@ export class PrismaPlayerRepository implements PlayerRepository {
 
     return pipe(
       Effect.promise(p),
-      Effect.map((playerData) => {
+      Effect.flatMap((playerData) => {
         if (!playerData) {
-          return null;
+          return Effect.fail(new PlayerNotFound(id));
         }
 
-        return Player.fromState({
-          ...playerData,
-          currentTrackId: TrackIdSchema.parse(playerData.currentTrackId),
-          id: PlayerIdSchema.parse(playerData.id),
-        });
+        return Effect.succeed(
+          Player.fromState({
+            ...playerData,
+            currentTrackId: TrackIdSchema.parse(playerData.currentTrackId),
+            id: PlayerIdSchema.parse(playerData.id),
+          })
+        );
       })
     );
   }
